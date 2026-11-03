@@ -20,7 +20,7 @@ providers that return a standard `usage` object.
 
 📖 **[OpenCode Go + SillyTavern setup guide](docs/OPENCODE-GO.md)** — direct connection, local proxy, troubleshooting, and Go vs OpenRouter comparison.
 
-**Guide languages:** [English](docs/OPENCODE-GO.md) · [Русский](docs/OPENCODE-GO.ru.md) · [Español](docs/OPENCODE-GO.es.md) · [Français](docs/OPENCODE-GO.fr.md) · [Deutsch](docs/OPENCODE-GO.de.md) · [Português (BR)](docs/OPENCODE-GO.pt-br.md) · [Italiano](docs/OPENCODE-GO.it.md) · [Polski](docs/OPENCODE-GO.pl.md) · [Türkçe](docs/OPENCODE-GO.tr.md) · [中文](docs/OPENCODE-GO.zh-cn.md) · [日本語](docs/OPENCODE-GO.ja.md)
+**Localized quick-start guides:** [Русский](docs/OPENCODE-GO.ru.md) · [Español](docs/OPENCODE-GO.es.md) · [Français](docs/OPENCODE-GO.fr.md) · [Deutsch](docs/OPENCODE-GO.de.md) · [Português (BR)](docs/OPENCODE-GO.pt-br.md) · [Italiano](docs/OPENCODE-GO.it.md) · [Polski](docs/OPENCODE-GO.pl.md) · [Türkçe](docs/OPENCODE-GO.tr.md) · [中文](docs/OPENCODE-GO.zh-cn.md) · [日本語](docs/OPENCODE-GO.ja.md) · [English full guide](docs/OPENCODE-GO.md)
 
 The extension UI follows SillyTavern's language setting: English, Russian,
 Spanish, French, German, Portuguese (BR), Italian, Polish, Turkish, Chinese
