@@ -183,12 +183,25 @@ The companion extension shows a badge under each message:
 ```
 
 - `⚡ 97%` — prompt cache hit rate;
-- `Go $0.0406` — amount counted against the Go monthly limit;
-- tooltip — cached tokens, input/output/reasoning, Go limit, list price;
+- `Go $0.0406` — Go allowance: the amount counted against the Go monthly limit;
+- tooltip — cached tokens, input/output/reasoning, Go allowance, list price;
 - per-swipe usage is preserved;
 - optional chat summary above the chat and in the extension settings.
 
 It also works with OpenRouter (`usage.cost` + `cached_tokens`).
+
+### Console vs badge
+
+The OpenCode Console's **Cost** column matches `opencode.list_cost` (the list
+price). The badge's `Go` value is `opencode.allowance`, which is what counts
+against the Go plan limit. The two can differ:
+
+- Gemini 4 Argon (50% promo): list price `$0.1696`, Go allowance `$0.3391` — **2×**;
+- Kimi K3: list price `$0.0101`, Go allowance `$0.0406` — **~4×**.
+
+The tooltip now shows both and the multiplier. If you want the badge to match
+the Console exactly, set **Badge cost → List price (Console)**; **Both** shows
+both numbers.
 
 Repository: https://github.com/Surdagon/st-opencode-usage-badge
 
@@ -199,6 +212,7 @@ Repository: https://github.com/Surdagon/st-opencode-usage-badge
 | `400 MissingSessionID` | no `x-opencode-session` header | add the header or use the proxy |
 | `401 Invalid credential` | old/revoked key, or wrong active custom key | use the latest `oc_sk_...`; check the active key; prefer the proxy |
 | `402 Insufficient account funds` | using the regular (non-Go) endpoint or empty balance | use `https://opencode.ai/inference/go/openai/v1` |
+| Badge shows `Go $0.339`, Console shows `$0.1696` | badge shows `opencode.allowance`, Console shows `opencode.list_cost` | set **Badge cost → List price (Console)** or **Both** |
 | `404` / HTML “Not Found” | URL is missing the path or includes `/chat/completions` twice | base URL must end at `.../go/openai/v1` |
 | `400 model must be a non-empty string` | model field is empty | enter a model ID, e.g. `glm-5.3` |
 | Empty answer, `finish_reason: length` | reasoning consumed all output tokens | set `reasoning_effort: low`, raise max response length, or use `minimax-m3` |

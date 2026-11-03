@@ -184,7 +184,7 @@ function buildBadgeData(usage) {
     if (mode === 'both') {
         if (hasGo) {
             primary = allowance;
-            primaryLabel = 'Go limit';
+            primaryLabel = 'Go allowance';
             secondary = hasList ? listCost : (hasCost ? cost : null);
             secondaryLabel = hasList ? 'List price' : (hasCost ? 'Cost' : null);
         } else if (hasCost) {
@@ -202,7 +202,7 @@ function buildBadgeData(usage) {
     } else if (mode === 'go') {
         if (hasGo) {
             primary = allowance;
-            primaryLabel = 'Go limit';
+            primaryLabel = 'Go allowance';
         } else if (hasList) {
             primary = listCost;
             primaryLabel = 'List price';
@@ -222,14 +222,14 @@ function buildBadgeData(usage) {
             primaryLabel = 'Cost';
         } else if (hasGo) {
             primary = allowance;
-            primaryLabel = 'Go limit';
+            primaryLabel = 'Go allowance';
         } else {
             primary = 0;
             primaryLabel = 'Cost';
         }
     } else if (hasGo) {
         primary = allowance;
-        primaryLabel = 'Go limit';
+        primaryLabel = 'Go allowance';
     } else if (hasCost && cost > 0) {
         primary = cost;
         primaryLabel = 'Cost';
@@ -280,14 +280,21 @@ function buildTooltip(data) {
         lines.push(`Output: ${data.output}${data.reasoning ? ` (reasoning ${data.reasoning})` : ''}`);
     }
     if (data.allowance !== null) {
-        lines.push(`Go limit: ${formatMoney(data.allowance)}`);
+        let goLine = `Go allowance: ${formatMoney(data.allowance)}`;
+        if (data.listCost !== null && data.listCost > 0) {
+            const ratio = data.allowance / data.listCost;
+            if (Math.abs(ratio - 1) > 0.01) {
+                goLine += ` (${ratio.toFixed(2)}× list price)`;
+            }
+        }
+        lines.push(goLine);
     }
     if (data.cost !== null && data.billingSource !== 'go') {
         lines.push(`Cost: ${formatMoney(data.cost)}`);
     }
     if (getSettings().showListPrice && data.listCost !== null
         && (data.cost === null || data.billingSource === 'go' || Math.abs(data.listCost - data.cost) > 1e-12)) {
-        lines.push(`List price: ${formatMoney(data.listCost)}`);
+        lines.push(`List price / Console cost: ${formatMoney(data.listCost)}`);
     }
 
     return lines.join('\n');
@@ -299,7 +306,7 @@ function removeBadge(container) {
 
 function formatBadgeCost(data) {
     if (!data || data.primary === null || data.primary === undefined) return '';
-    let text = data.billingSource === 'go' && data.primaryLabel === 'Go limit'
+    let text = data.billingSource === 'go' && data.primaryLabel === 'Go allowance'
         ? `Go ${formatMoney(data.primary)}`
         : formatMoney(data.primary);
     if (data.secondary !== null && data.secondary !== undefined) {
@@ -434,7 +441,7 @@ function formatSummary() {
     if (summary.cacheRate !== null) parts.push(`cache ${Math.round(summary.cacheRate * 100)}%`);
     parts.push(`${summary.generations} gen${summary.generations === 1 ? '' : 's'}`);
     if (summary.lastData?.primary !== null && summary.lastData?.primary !== undefined) {
-        const label = summary.lastData.primaryLabel === 'Go limit' ? 'Go ' : '';
+        const label = summary.lastData.primaryLabel === 'Go allowance' ? 'Go ' : '';
         parts.push(`last ${label}${formatMoney(summary.lastData.primary)}`);
     }
     return `Chat total: ${parts.join(' · ')}`;
@@ -631,9 +638,9 @@ function addSettingsUi() {
                 <div class="opencode-usage-setting-row">
                     <span>Badge cost</span>
                     <select id="opencode_usage_cost_display" class="text_pole">
-                        <option value="auto">Auto (Go limit / actual cost)</option>
-                        <option value="go">Go limit</option>
-                        <option value="list">List price</option>
+                        <option value="auto">Auto (Go allowance / actual cost)</option>
+                        <option value="go">Go allowance</option>
+                        <option value="list">List price (Console)</option>
                         <option value="both">Both</option>
                     </select>
                 </div>

@@ -1,7 +1,7 @@
 # SillyTavern OpenCode Usage Badge
 
 [![Install in SillyTavern](https://img.shields.io/badge/Install%20in-SillyTavern-6f42c1?style=for-the-badge)](http://localhost:8000/)
-[![Download ZIP](https://img.shields.io/badge/Download-ZIP-2ea44f?style=for-the-badge)](https://github.com/Surdagon/st-opencode-usage-badge/releases/download/v1.0.0/st-opencode-usage-badge.zip)
+[![Download ZIP](https://img.shields.io/badge/Download-ZIP-2ea44f?style=for-the-badge)](https://github.com/Surdagon/st-opencode-usage-badge/releases/latest/download/st-opencode-usage-badge.zip)
 [![Latest release](https://img.shields.io/github/v/release/Surdagon/st-opencode-usage-badge?style=for-the-badge)](https://github.com/Surdagon/st-opencode-usage-badge/releases/latest)
 
 A small SillyTavern extension that shows **prompt-cache hit rate** and
@@ -26,7 +26,7 @@ providers that return a standard `usage` object.
 - cost per message (Go allowance, actual cost, or list price);
 - optional chat summary above the chat and in the extension settings;
 - per-swipe usage (each swipe keeps its own cache/cost data);
-- tooltip with input/output/reasoning tokens, cached tokens, Go limit and list price;
+- tooltip with input/output/reasoning tokens, cached tokens, Go allowance and list price;
 - works with OpenRouter-style `usage.cost` and `prompt_tokens_details.cached_tokens`;
 - no external requests, no API keys stored by the extension.
 
@@ -43,9 +43,19 @@ kimi-k3
 Cache: 20736 / 21275 input (97%)
 Input: 539 new + 20736 cached
 Output: 154 (reasoning 17)
-Go limit: $0.0406
-List price: $0.0101
+Go allowance: $0.0406 (4.02× list price)
+List price / Console cost: $0.0101
 ```
+
+### Console vs badge
+
+The Console's **Cost** column matches `opencode.list_cost` (the list price).
+The badge's `Go` value is `opencode.allowance`, which is what counts against the
+Go monthly limit. It can be a multiple of the list price — in our tests Gemini 4
+Argon (50% promo) showed **2×**, Kimi K3 showed **~4×**.
+
+Set **Badge cost → List price (Console)** to match the Console exactly, or
+**Both** to show both numbers.
 
 Chat summary above the chat:
 
@@ -69,7 +79,7 @@ Chat summary above the chat:
 
 ### ZIP (offline)
 
-1. [Download the latest ZIP](https://github.com/Surdagon/st-opencode-usage-badge/releases/download/v1.0.0/st-opencode-usage-badge.zip).
+1. [Download the latest ZIP](https://github.com/Surdagon/st-opencode-usage-badge/releases/latest/download/st-opencode-usage-badge.zip).
 2. Extract the `st-opencode-usage-badge` folder into
    `SillyTavern/public/scripts/extensions/third-party/`.
 3. Reload SillyTavern (`Ctrl+F5`).
@@ -96,7 +106,7 @@ The extension is enabled by default. If needed, enable it under
 **Extensions → OpenCode Usage Badge**
 
 - show/hide badges;
-- badge cost: `Auto` / `Go limit` / `List price` / `Both`;
+- badge cost: `Auto` / `Go allowance` / `List price (Console)` / `Both`;
 - summary placement: above chat left / right / center / off;
 - show/hide chat summary in settings;
 - show/hide list price in tooltips.
