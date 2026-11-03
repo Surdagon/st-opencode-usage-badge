@@ -40,5 +40,9 @@
   "cache_timer_cold": "⏳ frío",
   "cache_timer_expired": "⏳ caducado",
   "cache_timer_tooltip": "Último acierto de caché: hace {age}. TTL estimado: {ttl} min (el proveedor no lo expone).",
-  "cache_timer_tooltip_none": "Aún no hay aciertos de caché. El temporizador empieza tras una respuesta con tokens en caché."
+  "cache_timer_tooltip_none": "Aún no hay aciertos de caché. El temporizador empieza tras una respuesta con tokens en caché.",
+  "settings_smart_cache_ttl": "Estimación inteligente del TTL de caché",
+  "settings_smart_cache_ttl_hint": "Aprende de los aciertos/fallos de caché observados; el TTL manual es el respaldo.",
+  "cache_timer_remaining_estimate": "⏳ ~{time}",
+  "cache_timer_tooltip_smart": "Último acierto de caché: hace {age}. TTL estimado inteligente: {ttl} (de {count} observaciones). El proveedor no expone el TTL."
 }

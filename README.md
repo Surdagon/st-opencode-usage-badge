@@ -78,6 +78,11 @@ from the last response with cached tokens and counts down using **Cache TTL
 top-bar tooltip shows the age of the last cache hit and the configured TTL;
 `⏳ expired` means the estimate has elapsed.
 
+Enable **Smart cache TTL estimate** to learn the TTL from observed cache
+hits/misses. The manual TTL is used as a fallback when smart mode is off or
+there is not enough data. The tooltip shows the estimated TTL and the number of
+observations.
+
 ## Installation
 
 ### Install from SillyTavern (recommended)
@@ -125,6 +130,7 @@ The extension is enabled by default. If needed, enable it under
 - summary placement: above chat left / right / center / off;
 - show/hide chat summary in settings;
 - show/hide cache timer and set cache TTL (minutes);
+- smart cache TTL estimate (learns from observed hits/misses);
 - show/hide list price in tooltips.
 
 ## How it works

@@ -40,5 +40,9 @@
   "cache_timer_cold": "⏳ frio",
   "cache_timer_expired": "⏳ expirado",
   "cache_timer_tooltip": "Último acerto de cache: há {age}. TTL estimado: {ttl} min (o provedor não expõe).",
-  "cache_timer_tooltip_none": "Ainda não há acertos de cache. O timer começa após uma resposta com tokens em cache."
+  "cache_timer_tooltip_none": "Ainda não há acertos de cache. O timer começa após uma resposta com tokens em cache.",
+  "settings_smart_cache_ttl": "Estimativa inteligente do TTL de cache",
+  "settings_smart_cache_ttl_hint": "Aprende com acertos/falhas de cache observados; o TTL manual é o fallback.",
+  "cache_timer_remaining_estimate": "⏳ ~{time}",
+  "cache_timer_tooltip_smart": "Último acerto de cache: há {age}. TTL estimado inteligente: {ttl} (de {count} observações). O provedor não expõe o TTL."
 }

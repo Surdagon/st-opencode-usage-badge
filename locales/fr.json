@@ -40,5 +40,9 @@
   "cache_timer_cold": "⏳ froid",
   "cache_timer_expired": "⏳ expiré",
   "cache_timer_tooltip": "Dernier hit de cache : il y a {age}. TTL estimé : {ttl} min (le fournisseur ne l'expose pas).",
-  "cache_timer_tooltip_none": "Aucun hit de cache pour l'instant. Le minuteur démarre après une réponse avec des tokens en cache."
+  "cache_timer_tooltip_none": "Aucun hit de cache pour l'instant. Le minuteur démarre après une réponse avec des tokens en cache.",
+  "settings_smart_cache_ttl": "Estimation intelligente du TTL de cache",
+  "settings_smart_cache_ttl_hint": "Apprend des hits/miss de cache observés ; le TTL manuel sert de secours.",
+  "cache_timer_remaining_estimate": "⏳ ~{time}",
+  "cache_timer_tooltip_smart": "Dernier hit de cache : il y a {age}. TTL estimé intelligent : {ttl} (sur {count} observations). Le fournisseur n'expose pas le TTL."
 }

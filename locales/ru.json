@@ -40,5 +40,9 @@
   "cache_timer_cold": "⏳ холодный",
   "cache_timer_expired": "⏳ истёк",
   "cache_timer_tooltip": "Последнее попадание в кэш: {age} назад. Оценка TTL: {ttl} мин (провайдер не сообщает точный TTL).",
-  "cache_timer_tooltip_none": "Попаданий в кэш ещё не было. Таймер запустится после ответа с cached tokens."
+  "cache_timer_tooltip_none": "Попаданий в кэш ещё не было. Таймер запустится после ответа с cached tokens.",
+  "settings_smart_cache_ttl": "Умная оценка TTL кэша",
+  "settings_smart_cache_ttl_hint": "Обучается на наблюдаемых попаданиях/промахах кэша; ручной TTL используется как запасной.",
+  "cache_timer_remaining_estimate": "⏳ ~{time}",
+  "cache_timer_tooltip_smart": "Последнее попадание в кэш: {age} назад. Умная оценка TTL: {ttl} (по {count} наблюдениям). Провайдер не сообщает точный TTL."
 }

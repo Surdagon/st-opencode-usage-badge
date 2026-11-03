@@ -40,5 +40,9 @@
   "cache_timer_cold": "⏳ kalt",
   "cache_timer_expired": "⏳ abgelaufen",
   "cache_timer_tooltip": "Letzter Cache-Hit: vor {age}. Geschätzte TTL: {ttl} Min. (Provider nennt keine exakte TTL).",
-  "cache_timer_tooltip_none": "Noch keine Cache-Hits. Der Timer startet nach einer Antwort mit Cache-Tokens."
+  "cache_timer_tooltip_none": "Noch keine Cache-Hits. Der Timer startet nach einer Antwort mit Cache-Tokens.",
+  "settings_smart_cache_ttl": "Intelligente Cache-TTL-Schätzung",
+  "settings_smart_cache_ttl_hint": "Lernt aus beobachteten Cache-Hits/-Misses; die manuelle TTL dient als Fallback.",
+  "cache_timer_remaining_estimate": "⏳ ~{time}",
+  "cache_timer_tooltip_smart": "Letzter Cache-Hit: vor {age}. Intelligente TTL-Schätzung: {ttl} (aus {count} Beobachtungen). Der Provider nennt keine exakte TTL."
 }

@@ -40,5 +40,9 @@
   "cache_timer_cold": "⏳ 冷",
   "cache_timer_expired": "⏳ 已过期",
   "cache_timer_tooltip": "上次缓存命中：{age} 前。预计 TTL：{ttl} 分钟（提供商不提供精确值）。",
-  "cache_timer_tooltip_none": "还没有缓存命中。收到带缓存 token 的响应后开始计时。"
+  "cache_timer_tooltip_none": "还没有缓存命中。收到带缓存 token 的响应后开始计时。",
+  "settings_smart_cache_ttl": "智能缓存 TTL 估算",
+  "settings_smart_cache_ttl_hint": "根据观察到的缓存命中和未命中学习；手动 TTL 作为后备。",
+  "cache_timer_remaining_estimate": "⏳ ~{time}",
+  "cache_timer_tooltip_smart": "上次缓存命中：{age} 前。智能 TTL 估算：{ttl}（基于 {count} 次观察）。提供商不提供精确 TTL。"
 }

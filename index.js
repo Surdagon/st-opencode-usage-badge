@@ -10,6 +10,7 @@ const DEFAULT_SETTINGS = {
     summaryPlacement: 'top-left',
     showCacheTimer: true,
     cacheTtlMinutes: 5,
+    smartCacheTtl: true,
 };
 
 const PENDING_TTL_MS = 30000;
@@ -515,6 +516,122 @@ function formatClock(ms) {
     return `${minutes}:${String(seconds).padStart(2, '0')}`;
 }
 
+function getUsageTimestamp(usage, message, swipe = null) {
+    const finished = swipe?.gen_finished
+        ?? swipe?.send_date
+        ?? message?.gen_finished
+        ?? message?.send_date;
+    const parsed = typeof finished === 'number' ? finished : Date.parse(String(finished || ''));
+    return Number(usage?._at) || (Number.isFinite(parsed) ? parsed : 0);
+}
+
+function getObservedUsages() {
+    const chat = getCtx().chat ?? [];
+    const observations = [];
+
+    for (const message of chat) {
+        if (!message) continue;
+        const usages = [];
+        if (Array.isArray(message.swipe_info) && message.swipe_info.length > 0) {
+            for (const swipe of message.swipe_info) {
+                if (swipe?.extra?.opencode_usage) {
+                    usages.push({ usage: swipe.extra.opencode_usage, swipe });
+                }
+            }
+        } else if (message.extra?.opencode_usage) {
+            usages.push({ usage: message.extra.opencode_usage, swipe: null });
+        }
+
+        for (const { usage, swipe } of usages) {
+            const at = getUsageTimestamp(usage, message, swipe);
+            if (!at) continue;
+
+            const cached = numberOrNull(
+                usage.prompt_tokens_details?.cached_tokens
+                ?? usage.opencode?.tokens?.cache_read,
+            );
+            observations.push({
+                at,
+                cached: cached ?? 0,
+                prompt: numberOrNull(usage.prompt_tokens),
+                model: String(message.extra?.model || ''),
+            });
+        }
+    }
+
+    observations.sort((a, b) => a.at - b.at);
+    return observations.slice(-80);
+}
+
+function estimateSmartTtl() {
+    const observations = getObservedUsages();
+    const manualTtl = Math.max(1, Number(getSettings().cacheTtlMinutes) || 5) * 60000;
+
+    if (!observations.length) {
+        return { ttl: manualTtl, smart: false, lower: null, upper: null, observations: 0 };
+    }
+
+    const lastModel = observations[observations.length - 1].model;
+    const filtered = lastModel
+        ? observations.filter(observation => !observation.model || observation.model === lastModel)
+        : observations;
+
+    let lower = null;
+    let upper = null;
+    let lowerCount = 0;
+    let upperCount = 0;
+    let lastHit = null;
+
+    for (const observation of filtered) {
+        if (observation.cached > 0) {
+            if (lastHit) {
+                const gap = observation.at - lastHit.at;
+                if (gap > 1000) {
+                    lower = Math.max(lower ?? 0, gap);
+                    lowerCount += 1;
+                }
+            }
+            lastHit = observation;
+        } else if (lastHit) {
+            const gap = observation.at - lastHit.at;
+            const promptOk = observation.prompt === null
+                || lastHit.prompt === null
+                || observation.prompt >= lastHit.prompt - 100;
+            if (gap >= 30000 && gap <= 24 * 60 * 60 * 1000 && promptOk) {
+                upper = Math.min(upper ?? Infinity, gap);
+                upperCount += 1;
+            }
+            lastHit = null;
+        }
+    }
+
+    let ttl = manualTtl;
+    let smart = false;
+
+    if (lower !== null && upper !== null) {
+        const midpoint = (lower + upper) / 2;
+        ttl = Math.max(lower + 15000, Math.min(upper - 15000, midpoint));
+        smart = true;
+    } else if (upper !== null) {
+        ttl = Math.min(manualTtl, upper - 15000);
+        smart = true;
+    } else if (lower !== null) {
+        ttl = Math.max(manualTtl, lower);
+        smart = true;
+    }
+
+    ttl = Math.max(60000, Math.min(ttl, 24 * 60 * 60 * 1000));
+    return {
+        ttl,
+        smart,
+        lower,
+        upper,
+        lowerCount,
+        upperCount,
+        observations: filtered.length,
+    };
+}
+
 function getCacheTimer() {
     const chat = getCtx().chat ?? [];
     let latest = null;
@@ -524,25 +641,22 @@ function getCacheTimer() {
         const usages = [];
         if (Array.isArray(message.swipe_info) && message.swipe_info.length > 0) {
             for (const swipe of message.swipe_info) {
-                if (swipe?.extra?.opencode_usage) usages.push(swipe.extra.opencode_usage);
+                if (swipe?.extra?.opencode_usage) {
+                    usages.push({ usage: swipe.extra.opencode_usage, swipe });
+                }
             }
         } else if (message.extra?.opencode_usage) {
-            usages.push(message.extra.opencode_usage);
+            usages.push({ usage: message.extra.opencode_usage, swipe: null });
         }
 
-        for (const usage of usages) {
+        for (const { usage, swipe } of usages) {
             const cached = numberOrNull(
                 usage.prompt_tokens_details?.cached_tokens
                 ?? usage.opencode?.tokens?.cache_read,
             );
             if (!cached || cached <= 0) continue;
 
-            const finished = message.gen_finished ?? message.send_date;
-            const parsedFinished = typeof finished === 'number'
-                ? finished
-                : Date.parse(String(finished || ''));
-            const at = Number(usage._at)
-                || (Number.isFinite(parsedFinished) ? parsedFinished : 0);
+            const at = getUsageTimestamp(usage, message, swipe);
             if (!at) continue;
 
             if (!latest || at > latest.at) {
@@ -553,10 +667,24 @@ function getCacheTimer() {
 
     if (!latest) return null;
 
-    const ttlMinutes = Math.max(1, Number(getSettings().cacheTtlMinutes) || 5);
-    const ttlMs = ttlMinutes * 60000;
+    const estimate = getSettings().smartCacheTtl
+        ? estimateSmartTtl()
+        : {
+            ttl: Math.max(1, Number(getSettings().cacheTtlMinutes) || 5) * 60000,
+            smart: false,
+            observations: 0,
+        };
+    const ttlMs = estimate.ttl;
     const age = Date.now() - latest.at;
-    return { at: latest.at, age, ttlMs, remaining: ttlMs - age, lastUsage: latest.usage };
+    return {
+        at: latest.at,
+        age,
+        ttlMs,
+        remaining: ttlMs - age,
+        lastUsage: latest.usage,
+        smart: estimate.smart,
+        estimate,
+    };
 }
 
 function formatCacheTimer() {
@@ -564,13 +692,22 @@ function formatCacheTimer() {
     const timer = getCacheTimer();
     if (!timer) return tr('cache_timer_cold');
     if (timer.remaining <= 0) return tr('cache_timer_expired');
-    return tr('cache_timer_remaining', { time: formatClock(timer.remaining) });
+    return timer.smart
+        ? tr('cache_timer_remaining_estimate', { time: formatClock(timer.remaining) })
+        : tr('cache_timer_remaining', { time: formatClock(timer.remaining) });
 }
 
 function formatCacheTimerTooltip() {
     if (!getSettings().showCacheTimer) return '';
     const timer = getCacheTimer();
     if (!timer) return tr('cache_timer_tooltip_none');
+    if (timer.smart) {
+        return tr('cache_timer_tooltip_smart', {
+            age: formatClock(timer.age),
+            ttl: formatClock(timer.ttlMs),
+            count: timer.estimate?.observations ?? 0,
+        });
+    }
     return tr('cache_timer_tooltip', {
         age: formatClock(timer.age),
         ttl: Math.round(timer.ttlMs / 60000),
@@ -824,6 +961,11 @@ function addSettingsUi(force = false) {
                 </div>
                 <small>${tr('settings_cache_ttl_hint')}</small>
                 <label class="checkbox_label">
+                    <input type="checkbox" id="opencode_usage_smart_ttl">
+                    <span>${tr('settings_smart_cache_ttl')}</span>
+                </label>
+                <small>${tr('settings_smart_cache_ttl_hint')}</small>
+                <label class="checkbox_label">
                     <input type="checkbox" id="opencode_usage_list_price">
                     <span>${tr('settings_show_list')}</span>
                 </label>
@@ -840,6 +982,7 @@ function addSettingsUi(force = false) {
     const placement = wrapper.querySelector('#opencode_usage_placement');
     const showTimer = wrapper.querySelector('#opencode_usage_show_timer');
     const cacheTtl = wrapper.querySelector('#opencode_usage_cache_ttl');
+    const smartTtl = wrapper.querySelector('#opencode_usage_smart_ttl');
     enabled.checked = getSettings().enabled;
     listPrice.checked = getSettings().showListPrice;
     costDisplay.value = getSettings().costDisplay;
@@ -847,6 +990,7 @@ function addSettingsUi(force = false) {
     placement.value = getSettings().summaryPlacement;
     showTimer.checked = getSettings().showCacheTimer;
     cacheTtl.value = getSettings().cacheTtlMinutes;
+    smartTtl.checked = getSettings().smartCacheTtl;
 
     enabled.addEventListener('change', () => {
         getSettings().enabled = enabled.checked;
@@ -882,6 +1026,11 @@ function addSettingsUi(force = false) {
         const value = Math.min(1440, Math.max(1, parseInt(cacheTtl.value, 10) || 5));
         getSettings().cacheTtlMinutes = value;
         cacheTtl.value = value;
+        getCtx().saveSettingsDebounced();
+        updateSummary();
+    });
+    smartTtl.addEventListener('change', () => {
+        getSettings().smartCacheTtl = smartTtl.checked;
         getCtx().saveSettingsDebounced();
         updateSummary();
     });

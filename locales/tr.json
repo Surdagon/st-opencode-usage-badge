@@ -40,5 +40,9 @@
   "cache_timer_cold": "⏳ soğuk",
   "cache_timer_expired": "⏳ süresi doldu",
   "cache_timer_tooltip": "Son önbellek isabeti: {age} önce. Tahmini TTL: {ttl} dk (sağlayıcı tam TTL vermez).",
-  "cache_timer_tooltip_none": "Henüz önbellek isabeti yok. Zamanlayıcı, önbellek tokenı olan bir yanıttan sonra başlar."
+  "cache_timer_tooltip_none": "Henüz önbellek isabeti yok. Zamanlayıcı, önbellek tokenı olan bir yanıttan sonra başlar.",
+  "settings_smart_cache_ttl": "Akıllı önbellek TTL tahmini",
+  "settings_smart_cache_ttl_hint": "Gözlenen önbellek isabet/ıskalarından öğrenir; manuel TTL yedektir.",
+  "cache_timer_remaining_estimate": "⏳ ~{time}",
+  "cache_timer_tooltip_smart": "Son önbellek isabeti: {age} önce. Akıllı TTL tahmini: {ttl} ({count} gözlemden). Sağlayıcı tam TTL vermez."
 }

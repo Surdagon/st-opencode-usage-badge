@@ -200,6 +200,10 @@ countdown based on the last response with cached tokens and the **Cache TTL
 shows the age of the last cache hit and the configured TTL; `⏳ expired` means
 the estimate has elapsed.
 
+Enable **Smart cache TTL estimate** to learn the TTL from observed cache hits
+and misses. The manual TTL is the fallback when smart mode is off or there is
+not enough data. The tooltip shows the estimate and observation count.
+
 ### Console vs badge
 
 The OpenCode Console's **Cost** column matches `opencode.list_cost` (the list

@@ -40,5 +40,9 @@
   "cache_timer_cold": "⏳ コールド",
   "cache_timer_expired": "⏳ 期限切れ",
   "cache_timer_tooltip": "最後のキャッシュヒット: {age} 前。推定 TTL: {ttl} 分（プロバイダーは正確な TTL を公開しません）。",
-  "cache_timer_tooltip_none": "キャッシュヒットはまだありません。キャッシュトークンを含む応答後にタイマーが始まります。"
+  "cache_timer_tooltip_none": "キャッシュヒットはまだありません。キャッシュトークンを含む応答後にタイマーが始まります。",
+  "settings_smart_cache_ttl": "スマートキャッシュ TTL 推定",
+  "settings_smart_cache_ttl_hint": "観測されたキャッシュヒット/ミスから学習します。手動 TTL はフォールバックです。",
+  "cache_timer_remaining_estimate": "⏳ ~{time}",
+  "cache_timer_tooltip_smart": "最後のキャッシュヒット: {age} 前。スマート TTL 推定: {ttl}（{count} 件の観測から）。プロバイダーは正確な TTL を公開しません。"
 }

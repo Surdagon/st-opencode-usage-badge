@@ -40,5 +40,9 @@
   "cache_timer_cold": "⏳ freddo",
   "cache_timer_expired": "⏳ scaduto",
   "cache_timer_tooltip": "Ultimo cache hit: {age} fa. TTL stimato: {ttl} min (il provider non lo espone).",
-  "cache_timer_tooltip_none": "Nessun cache hit. Il timer parte dopo una risposta con token in cache."
+  "cache_timer_tooltip_none": "Nessun cache hit. Il timer parte dopo una risposta con token in cache.",
+  "settings_smart_cache_ttl": "Stima intelligente del TTL cache",
+  "settings_smart_cache_ttl_hint": "Impara dai cache hit/miss osservati; il TTL manuale è il fallback.",
+  "cache_timer_remaining_estimate": "⏳ ~{time}",
+  "cache_timer_tooltip_smart": "Ultimo cache hit: {age} fa. TTL stimato intelligente: {ttl} (da {count} osservazioni). Il provider non espone il TTL."
 }
