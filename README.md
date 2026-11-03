@@ -1,10 +1,14 @@
 # SillyTavern OpenCode Usage Badge
 
+[![Install in SillyTavern](https://img.shields.io/badge/Install%20in-SillyTavern-6f42c1?style=for-the-badge)](#installation)
+[![Download ZIP](https://img.shields.io/badge/Download-ZIP-2ea44f?style=for-the-badge)](https://github.com/Surdagon/st-opencode-usage-badge/releases/latest)
+[![Latest release](https://img.shields.io/github/v/release/Surdagon/st-opencode-usage-badge?style=for-the-badge)](https://github.com/Surdagon/st-opencode-usage-badge/releases/latest)
+
 A small SillyTavern extension that shows **prompt-cache hit rate** and
 **per-message cost** for OpenCode Go, OpenRouter, and other chat-completion
 providers that return a standard `usage` object.
 
-![badge example](https://img.shields.io/badge/badge-%E2%9A%A1%2097%25%20%C2%B7%20Go%20%240.0406-blue)
+![OpenCode Usage Badge demo](assets/demo.png)
 
 ## Features
 
@@ -41,19 +45,29 @@ Chat summary above the chat:
 
 ## Installation
 
-1. Clone this repository into your SillyTavern third-party extensions folder:
+### Easiest: ZIP
 
-   ```bash
-   cd SillyTavern/public/scripts/extensions/third-party
-   git clone https://github.com/Surdagon/st-opencode-usage-badge.git
-   ```
+1. [Download the latest ZIP](https://github.com/Surdagon/st-opencode-usage-badge/releases/latest).
+2. Extract the `st-opencode-usage-badge` folder into
+   `SillyTavern/public/scripts/extensions/third-party/`.
+3. Reload SillyTavern (`Ctrl+F5`).
 
-   Or download the ZIP and extract it into
-   `public/scripts/extensions/third-party/st-opencode-usage-badge`.
+### Git
 
-2. Reload SillyTavern (`Ctrl+F5`).
-3. The extension is enabled by default. If needed, enable it under
-   **Extensions → OpenCode Usage Badge**.
+```bash
+cd SillyTavern/public/scripts/extensions/third-party
+git clone https://github.com/Surdagon/st-opencode-usage-badge.git
+```
+
+### Official catalog
+
+The extension has been submitted to the official SillyTavern content catalog:
+[PR #66](https://github.com/SillyTavern/SillyTavern-Content/pull/66). Once it is
+merged, you can install it without GitHub via
+**Extensions → Download Extensions & Assets → Extensions → OpenCode Usage Badge → Download**.
+
+The extension is enabled by default. If needed, enable it under
+**Extensions → OpenCode Usage Badge**.
 
 ## Settings
 
