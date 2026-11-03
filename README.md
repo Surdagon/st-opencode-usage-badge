@@ -1,6 +1,6 @@
 # SillyTavern OpenCode Usage Badge
 
-[![Install in SillyTavern](https://img.shields.io/badge/Install%20in-SillyTavern-6f42c1?style=for-the-badge)](#installation)
+[![Install in SillyTavern](https://img.shields.io/badge/Install%20in-SillyTavern-6f42c1?style=for-the-badge)](http://localhost:8000/)
 [![Download ZIP](https://img.shields.io/badge/Download-ZIP-2ea44f?style=for-the-badge)](https://github.com/Surdagon/st-opencode-usage-badge/releases/download/v1.0.0/st-opencode-usage-badge.zip)
 [![Latest release](https://img.shields.io/github/v/release/Surdagon/st-opencode-usage-badge?style=for-the-badge)](https://github.com/Surdagon/st-opencode-usage-badge/releases/latest)
 
@@ -9,6 +9,14 @@ A small SillyTavern extension that shows **prompt-cache hit rate** and
 providers that return a standard `usage` object.
 
 ![OpenCode Usage Badge demo](assets/demo.png)
+
+> **No GitHub account needed.** Open [SillyTavern](http://localhost:8000/) → **Extensions → Install Extension** → paste this URL → click **Install**:
+>
+> ```text
+> https://github.com/Surdagon/st-opencode-usage-badge
+> ```
+>
+> If the button above does not open SillyTavern, start SillyTavern first and click it again.
 
 ## Features
 
@@ -45,7 +53,19 @@ Chat summary above the chat:
 
 ## Installation
 
-### Easiest: ZIP
+### Install from SillyTavern (recommended)
+
+1. Open [SillyTavern](http://localhost:8000/).
+2. Go to **Extensions → Install Extension**.
+3. Paste this URL:
+
+   ```text
+   https://github.com/Surdagon/st-opencode-usage-badge
+   ```
+
+4. Click **Install**, then reload with `Ctrl+F5`.
+
+### ZIP (offline)
 
 1. [Download the latest ZIP](https://github.com/Surdagon/st-opencode-usage-badge/releases/download/v1.0.0/st-opencode-usage-badge.zip).
 2. Extract the `st-opencode-usage-badge` folder into
