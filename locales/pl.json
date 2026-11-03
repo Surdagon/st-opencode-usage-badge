@@ -32,5 +32,13 @@
   "tooltip_cost": "Koszt: {cost}",
   "tooltip_list": "Cena katalogowa / koszt Console: {cost}",
   "topbar_total": "razem {cost}",
-  "topbar_last": "ostatnie {cost}"
+  "topbar_last": "ostatnie {cost}",
+  "settings_show_cache_timer": "Pokazuj timer cache",
+  "settings_cache_ttl": "TTL cache (minuty)",
+  "settings_cache_ttl_hint": "Szacunek; API nie podaje dokładnego TTL.",
+  "cache_timer_remaining": "⏳ {time}",
+  "cache_timer_cold": "⏳ zimny",
+  "cache_timer_expired": "⏳ wygasł",
+  "cache_timer_tooltip": "Ostatni cache hit: {age} temu. Szacowany TTL: {ttl} min (dostawca nie podaje TTL).",
+  "cache_timer_tooltip_none": "Brak trafień cache. Timer startuje po odpowiedzi z tokenami z cache."
 }

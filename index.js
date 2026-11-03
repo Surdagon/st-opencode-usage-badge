@@ -5,9 +5,11 @@ const SETTINGS_KEY = 'opencodeUsageBadge';
 const DEFAULT_SETTINGS = {
     enabled: true,
     showListPrice: true,
-    costDisplay: 'auto',
+    costDisplay: 'both',
     showSummary: true,
     summaryPlacement: 'top-left',
+    showCacheTimer: true,
+    cacheTtlMinutes: 5,
 };
 
 const PENDING_TTL_MS = 30000;
@@ -506,6 +508,75 @@ function summarizeChat() {
     return summary;
 }
 
+function formatClock(ms) {
+    const totalSeconds = Math.max(0, Math.floor(ms / 1000));
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+    return `${minutes}:${String(seconds).padStart(2, '0')}`;
+}
+
+function getCacheTimer() {
+    const chat = getCtx().chat ?? [];
+    let latest = null;
+
+    for (const message of chat) {
+        if (!message) continue;
+        const usages = [];
+        if (Array.isArray(message.swipe_info) && message.swipe_info.length > 0) {
+            for (const swipe of message.swipe_info) {
+                if (swipe?.extra?.opencode_usage) usages.push(swipe.extra.opencode_usage);
+            }
+        } else if (message.extra?.opencode_usage) {
+            usages.push(message.extra.opencode_usage);
+        }
+
+        for (const usage of usages) {
+            const cached = numberOrNull(
+                usage.prompt_tokens_details?.cached_tokens
+                ?? usage.opencode?.tokens?.cache_read,
+            );
+            if (!cached || cached <= 0) continue;
+
+            const finished = message.gen_finished ?? message.send_date;
+            const parsedFinished = typeof finished === 'number'
+                ? finished
+                : Date.parse(String(finished || ''));
+            const at = Number(usage._at)
+                || (Number.isFinite(parsedFinished) ? parsedFinished : 0);
+            if (!at) continue;
+
+            if (!latest || at > latest.at) {
+                latest = { at, usage };
+            }
+        }
+    }
+
+    if (!latest) return null;
+
+    const ttlMinutes = Math.max(1, Number(getSettings().cacheTtlMinutes) || 5);
+    const ttlMs = ttlMinutes * 60000;
+    const age = Date.now() - latest.at;
+    return { at: latest.at, age, ttlMs, remaining: ttlMs - age, lastUsage: latest.usage };
+}
+
+function formatCacheTimer() {
+    if (!getSettings().showCacheTimer) return '';
+    const timer = getCacheTimer();
+    if (!timer) return tr('cache_timer_cold');
+    if (timer.remaining <= 0) return tr('cache_timer_expired');
+    return tr('cache_timer_remaining', { time: formatClock(timer.remaining) });
+}
+
+function formatCacheTimerTooltip() {
+    if (!getSettings().showCacheTimer) return '';
+    const timer = getCacheTimer();
+    if (!timer) return tr('cache_timer_tooltip_none');
+    return tr('cache_timer_tooltip', {
+        age: formatClock(timer.age),
+        ttl: Math.round(timer.ttlMs / 60000),
+    });
+}
+
 function formatSummary() {
     const summary = summarizeChat();
     if (summary.generations === 0) return tr('summary_no_usage');
@@ -570,6 +641,8 @@ function formatTopBarSummary() {
     if (total) parts.push(tr('topbar_total', { cost: total }));
     const last = summary.lastData ? formatBadgeCost(summary.lastData) : '';
     if (last) parts.push(tr('topbar_last', { cost: last }));
+    const timer = formatCacheTimer();
+    if (timer) parts.push(timer);
     return parts.join(' · ');
 }
 
@@ -601,7 +674,7 @@ function updateSummary() {
     const placement = getSettings().summaryPlacement || 'top-left';
     const text = placement === 'off' ? '' : formatTopBarSummary();
     bar.textContent = text;
-    bar.title = formatSummary();
+    bar.title = [formatSummary(), formatCacheTimerTooltip()].filter(Boolean).join('\n');
     bar.style.display = text ? '' : 'none';
     bar.classList.toggle('align-right', placement === 'top-right');
     bar.classList.toggle('align-center', placement === 'top-center');
@@ -611,19 +684,20 @@ function attachUsage(index, message, usage) {
     if (!message || !usage) return;
 
     const swipeId = Number.isInteger(message.swipe_id) ? message.swipe_id : 0;
+    const storedUsage = { ...usage, _at: Date.now() };
     message.extra = message.extra || {};
-    message.extra.opencode_usage = usage;
+    message.extra.opencode_usage = storedUsage;
 
     if (Array.isArray(message.swipe_info) && message.swipe_info[swipeId]) {
         message.swipe_info[swipeId].extra = message.swipe_info[swipeId].extra || {};
-        message.swipe_info[swipeId].extra.opencode_usage = usage;
+        message.swipe_info[swipeId].extra.opencode_usage = storedUsage;
     }
 
     if (message.extra.api_usage === undefined) {
         message.extra.api_usage = {
-            prompt_tokens: usage.prompt_tokens,
-            completion_tokens: usage.completion_tokens,
-            total_tokens: usage.total_tokens,
+            prompt_tokens: storedUsage.prompt_tokens,
+            completion_tokens: storedUsage.completion_tokens,
+            total_tokens: storedUsage.total_tokens,
         };
     }
 
@@ -741,6 +815,15 @@ function addSettingsUi(force = false) {
                     <span>${tr('settings_show_summary')}</span>
                 </label>
                 <label class="checkbox_label">
+                    <input type="checkbox" id="opencode_usage_show_timer">
+                    <span>${tr('settings_show_cache_timer')}</span>
+                </label>
+                <div class="opencode-usage-setting-row">
+                    <span>${tr('settings_cache_ttl')}</span>
+                    <input type="number" id="opencode_usage_cache_ttl" class="text_pole" min="1" max="1440" step="1">
+                </div>
+                <small>${tr('settings_cache_ttl_hint')}</small>
+                <label class="checkbox_label">
                     <input type="checkbox" id="opencode_usage_list_price">
                     <span>${tr('settings_show_list')}</span>
                 </label>
@@ -755,11 +838,15 @@ function addSettingsUi(force = false) {
     const costDisplay = wrapper.querySelector('#opencode_usage_cost_display');
     const showSummary = wrapper.querySelector('#opencode_usage_show_summary');
     const placement = wrapper.querySelector('#opencode_usage_placement');
+    const showTimer = wrapper.querySelector('#opencode_usage_show_timer');
+    const cacheTtl = wrapper.querySelector('#opencode_usage_cache_ttl');
     enabled.checked = getSettings().enabled;
     listPrice.checked = getSettings().showListPrice;
     costDisplay.value = getSettings().costDisplay;
     showSummary.checked = getSettings().showSummary;
     placement.value = getSettings().summaryPlacement;
+    showTimer.checked = getSettings().showCacheTimer;
+    cacheTtl.value = getSettings().cacheTtlMinutes;
 
     enabled.addEventListener('change', () => {
         getSettings().enabled = enabled.checked;
@@ -783,6 +870,18 @@ function addSettingsUi(force = false) {
     });
     placement.addEventListener('change', () => {
         getSettings().summaryPlacement = placement.value;
+        getCtx().saveSettingsDebounced();
+        updateSummary();
+    });
+    showTimer.addEventListener('change', () => {
+        getSettings().showCacheTimer = showTimer.checked;
+        getCtx().saveSettingsDebounced();
+        updateSummary();
+    });
+    cacheTtl.addEventListener('change', () => {
+        const value = Math.min(1440, Math.max(1, parseInt(cacheTtl.value, 10) || 5));
+        getSettings().cacheTtlMinutes = value;
+        cacheTtl.value = value;
         getCtx().saveSettingsDebounced();
         updateSummary();
     });
@@ -832,4 +931,11 @@ function registerEvents() {
     addSettingsUi(true);
     registerEvents();
     scheduleRenderAll(500);
+
+    setInterval(() => {
+        const bar = document.getElementById('opencode_usage_topbar');
+        if (!bar || bar.style.display === 'none') return;
+        bar.textContent = formatTopBarSummary();
+        bar.title = [formatSummary(), formatCacheTimerTooltip()].filter(Boolean).join('\n');
+    }, 1000);
 })();

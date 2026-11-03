@@ -46,6 +46,11 @@
     flex: 1 1 auto;
 }
 
+.opencode-usage-setting-row > input[type="number"] {
+    width: 84px;
+    flex: 0 0 auto;
+}
+
 .opencode-usage-summary {
     margin: 6px 0;
     padding: 4px 6px;

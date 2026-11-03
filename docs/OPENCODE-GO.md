@@ -192,6 +192,14 @@ The companion extension shows a badge under each message:
 
 It also works with OpenRouter (`usage.cost` + `cached_tokens`).
 
+### Cache timer
+
+The API does not expose the exact cache TTL. The extension shows an estimated
+countdown based on the last response with cached tokens and the **Cache TTL
+(minutes)** setting (default 5). Set it to 60 for one-hour caches. The tooltip
+shows the age of the last cache hit and the configured TTL; `⏳ expired` means
+the estimate has elapsed.
+
 ### Console vs badge
 
 The OpenCode Console's **Cost** column matches `opencode.list_cost` (the list

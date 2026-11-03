@@ -31,6 +31,7 @@ Spanish, French, German, Portuguese (BR), Italian, Polish, Turkish, Chinese
 - cache hit rate under every generated message (`⚡ 97%`);
 - cost per message (Go allowance, actual cost, or list price);
 - optional chat summary above the chat and in the extension settings;
+- estimated cache timer with configurable TTL;
 - per-swipe usage (each swipe keeps its own cache/cost data);
 - tooltip with input/output/reasoning tokens, cached tokens, Go allowance and list price;
 - works with OpenRouter-style `usage.cost` and `prompt_tokens_details.cached_tokens`;
@@ -66,8 +67,16 @@ Set **Badge cost → List price (Console)** to match the Console exactly, or
 Chat summary above the chat:
 
 ```text
-⚡ 65% · total Go $0.336 · last Go $0.0406
+⚡ 65% · total Go $0.336 · last Go $0.0406 · ⏳ 3:42
 ```
+
+### Cache timer
+
+The API does not expose the exact cache TTL. The timer is an estimate: it starts
+from the last response with cached tokens and counts down using **Cache TTL
+(minutes)** in the settings (default 5). Set it to 60 for one-hour caches. The
+top-bar tooltip shows the age of the last cache hit and the configured TTL;
+`⏳ expired` means the estimate has elapsed.
 
 ## Installation
 
@@ -115,6 +124,7 @@ The extension is enabled by default. If needed, enable it under
 - badge cost: `Auto` / `Go allowance` / `List price (Console)` / `Both`;
 - summary placement: above chat left / right / center / off;
 - show/hide chat summary in settings;
+- show/hide cache timer and set cache TTL (minutes);
 - show/hide list price in tooltips.
 
 ## How it works

@@ -32,5 +32,13 @@
   "tooltip_cost": "Maliyet: {cost}",
   "tooltip_list": "Liste fiyatı / Console maliyeti: {cost}",
   "topbar_total": "toplam {cost}",
-  "topbar_last": "son {cost}"
+  "topbar_last": "son {cost}",
+  "settings_show_cache_timer": "Önbellek zamanlayıcısını göster",
+  "settings_cache_ttl": "Önbellek TTL (dakika)",
+  "settings_cache_ttl_hint": "Tahmini; API tam TTL vermez.",
+  "cache_timer_remaining": "⏳ {time}",
+  "cache_timer_cold": "⏳ soğuk",
+  "cache_timer_expired": "⏳ süresi doldu",
+  "cache_timer_tooltip": "Son önbellek isabeti: {age} önce. Tahmini TTL: {ttl} dk (sağlayıcı tam TTL vermez).",
+  "cache_timer_tooltip_none": "Henüz önbellek isabeti yok. Zamanlayıcı, önbellek tokenı olan bir yanıttan sonra başlar."
 }

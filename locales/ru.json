@@ -32,5 +32,13 @@
   "tooltip_cost": "Стоимость: {cost}",
   "tooltip_list": "Прайс / стоимость в Console: {cost}",
   "topbar_total": "всего {cost}",
-  "topbar_last": "последнее {cost}"
+  "topbar_last": "последнее {cost}",
+  "settings_show_cache_timer": "Показывать таймер кэша",
+  "settings_cache_ttl": "TTL кэша (минуты)",
+  "settings_cache_ttl_hint": "Оценка: API не сообщает точный TTL кэша.",
+  "cache_timer_remaining": "⏳ {time}",
+  "cache_timer_cold": "⏳ холодный",
+  "cache_timer_expired": "⏳ истёк",
+  "cache_timer_tooltip": "Последнее попадание в кэш: {age} назад. Оценка TTL: {ttl} мин (провайдер не сообщает точный TTL).",
+  "cache_timer_tooltip_none": "Попаданий в кэш ещё не было. Таймер запустится после ответа с cached tokens."
 }

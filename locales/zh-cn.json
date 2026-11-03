@@ -32,5 +32,13 @@
   "tooltip_cost": "费用：{cost}",
   "tooltip_list": "标价 / Console 费用：{cost}",
   "topbar_total": "总计 {cost}",
-  "topbar_last": "最后 {cost}"
+  "topbar_last": "最后 {cost}",
+  "settings_show_cache_timer": "显示缓存计时器",
+  "settings_cache_ttl": "缓存 TTL（分钟）",
+  "settings_cache_ttl_hint": "估算值；API 不提供精确 TTL。",
+  "cache_timer_remaining": "⏳ {time}",
+  "cache_timer_cold": "⏳ 冷",
+  "cache_timer_expired": "⏳ 已过期",
+  "cache_timer_tooltip": "上次缓存命中：{age} 前。预计 TTL：{ttl} 分钟（提供商不提供精确值）。",
+  "cache_timer_tooltip_none": "还没有缓存命中。收到带缓存 token 的响应后开始计时。"
 }

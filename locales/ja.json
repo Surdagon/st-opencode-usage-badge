@@ -32,5 +32,13 @@
   "tooltip_cost": "コスト：{cost}",
   "tooltip_list": "定価 / Console コスト：{cost}",
   "topbar_total": "合計 {cost}",
-  "topbar_last": "最後 {cost}"
+  "topbar_last": "最後 {cost}",
+  "settings_show_cache_timer": "キャッシュタイマーを表示",
+  "settings_cache_ttl": "キャッシュ TTL（分）",
+  "settings_cache_ttl_hint": "推定値。API は正確な TTL を返しません。",
+  "cache_timer_remaining": "⏳ {time}",
+  "cache_timer_cold": "⏳ コールド",
+  "cache_timer_expired": "⏳ 期限切れ",
+  "cache_timer_tooltip": "最後のキャッシュヒット: {age} 前。推定 TTL: {ttl} 分（プロバイダーは正確な TTL を公開しません）。",
+  "cache_timer_tooltip_none": "キャッシュヒットはまだありません。キャッシュトークンを含む応答後にタイマーが始まります。"
 }
