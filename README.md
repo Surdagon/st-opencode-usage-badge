@@ -18,6 +18,8 @@ providers that return a standard `usage` object.
 >
 > If the button above does not open SillyTavern, start SillyTavern first and click it again.
 
+📖 **[OpenCode Go + SillyTavern setup guide](docs/OPENCODE-GO.md)** — direct connection, local proxy, troubleshooting, and Go vs OpenRouter comparison.
+
 ## Features
 
 - cache hit rate under every generated message (`⚡ 97%`);
