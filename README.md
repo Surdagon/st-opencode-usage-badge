@@ -1,7 +1,7 @@
 # SillyTavern OpenCode Usage Badge
 
 [![Install in SillyTavern](https://img.shields.io/badge/Install%20in-SillyTavern-6f42c1?style=for-the-badge)](#installation)
-[![Download ZIP](https://img.shields.io/badge/Download-ZIP-2ea44f?style=for-the-badge)](https://github.com/Surdagon/st-opencode-usage-badge/releases/latest)
+[![Download ZIP](https://img.shields.io/badge/Download-ZIP-2ea44f?style=for-the-badge)](https://github.com/Surdagon/st-opencode-usage-badge/releases/download/v1.0.0/st-opencode-usage-badge.zip)
 [![Latest release](https://img.shields.io/github/v/release/Surdagon/st-opencode-usage-badge?style=for-the-badge)](https://github.com/Surdagon/st-opencode-usage-badge/releases/latest)
 
 A small SillyTavern extension that shows **prompt-cache hit rate** and
@@ -47,7 +47,7 @@ Chat summary above the chat:
 
 ### Easiest: ZIP
 
-1. [Download the latest ZIP](https://github.com/Surdagon/st-opencode-usage-badge/releases/latest).
+1. [Download the latest ZIP](https://github.com/Surdagon/st-opencode-usage-badge/releases/download/v1.0.0/st-opencode-usage-badge.zip).
 2. Extract the `st-opencode-usage-badge` folder into
    `SillyTavern/public/scripts/extensions/third-party/`.
 3. Reload SillyTavern (`Ctrl+F5`).
