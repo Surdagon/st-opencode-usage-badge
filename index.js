@@ -15,6 +15,76 @@ const MAX_PENDING = 20;
 const pendingUsages = [];
 let fetchHookInstalled = false;
 
+const LOCALE_ALIASES = {
+    en: 'en.json',
+    'en-us': 'en.json',
+    'en-gb': 'en.json',
+    ru: 'ru.json',
+    'ru-ru': 'ru.json',
+    es: 'es.json',
+    'es-es': 'es.json',
+    'es-mx': 'es.json',
+    fr: 'fr.json',
+    'fr-fr': 'fr.json',
+    de: 'de.json',
+    'de-de': 'de.json',
+    pt: 'pt-br.json',
+    'pt-br': 'pt-br.json',
+    'pt-pt': 'pt-br.json',
+    it: 'it.json',
+    'it-it': 'it.json',
+    pl: 'pl.json',
+    'pl-pl': 'pl.json',
+    tr: 'tr.json',
+    'tr-tr': 'tr.json',
+    zh: 'zh-cn.json',
+    'zh-cn': 'zh-cn.json',
+    'zh-tw': 'zh-cn.json',
+    ja: 'ja.json',
+    'ja-jp': 'ja.json',
+};
+
+let localeData = {};
+let fallbackLocaleData = {};
+
+async function loadLocaleFile(file) {
+    const response = await fetch(new URL(`./locales/${file}`, import.meta.url));
+    if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+    return response.json();
+}
+
+async function loadLocale() {
+    const code = String(getContext().getCurrentLocale?.() || 'en').toLowerCase();
+    const file = LOCALE_ALIASES[code] || LOCALE_ALIASES[code.split('-')[0]] || 'en.json';
+
+    try {
+        fallbackLocaleData = await loadLocaleFile('en.json');
+    } catch (error) {
+        console.debug(`[${MODULE_NAME}] Could not load English locale:`, error);
+    }
+
+    if (file === 'en.json') {
+        localeData = fallbackLocaleData;
+        return;
+    }
+
+    try {
+        localeData = await loadLocaleFile(file);
+    } catch (error) {
+        console.debug(`[${MODULE_NAME}] Could not load locale ${file}:`, error);
+        localeData = fallbackLocaleData;
+    }
+}
+
+function tr(key, vars = {}) {
+    const template = localeData[key] ?? fallbackLocaleData[key] ?? key;
+    return String(template).replace(/\{(\w+)\}/g, (_, name) => {
+        return vars[name] !== undefined ? String(vars[name]) : `{${name}}`;
+    });
+}
+
 function getSettings() {
     if (!extension_settings[SETTINGS_KEY] || typeof extension_settings[SETTINGS_KEY] !== 'object') {
         extension_settings[SETTINGS_KEY] = { ...DEFAULT_SETTINGS };
@@ -267,34 +337,42 @@ function buildBadgeData(usage) {
 
 function buildTooltip(data) {
     const lines = [];
-    lines.push(data.billingSource === 'go' ? 'OpenCode Go' : 'API usage');
+    lines.push(data.billingSource === 'go' ? 'OpenCode Go' : tr('tooltip_api_usage'));
 
     if (data.cacheRate !== null) {
-        lines.push(`Cache: ${data.cached} / ${data.prompt} input tokens (${Math.round(data.cacheRate * 100)}%)`);
+        lines.push(tr('tooltip_cache', {
+            cached: data.cached,
+            prompt: data.prompt,
+            percent: Math.round(data.cacheRate * 100),
+        }));
     }
     if (data.prompt !== null) {
         const uncached = Math.max(0, data.prompt - (data.cached ?? 0));
-        lines.push(`Input: ${uncached} new + ${data.cached ?? 0} cached`);
+        lines.push(tr('tooltip_input', { uncached, cached: data.cached ?? 0 }));
     }
     if (data.output !== null) {
-        lines.push(`Output: ${data.output}${data.reasoning ? ` (reasoning ${data.reasoning})` : ''}`);
+        lines.push(data.reasoning
+            ? tr('tooltip_output_reasoning', { output: data.output, reasoning: data.reasoning })
+            : tr('tooltip_output', { output: data.output }));
     }
     if (data.allowance !== null) {
-        let goLine = `Go allowance: ${formatMoney(data.allowance)}`;
+        let ratio = null;
         if (data.listCost !== null && data.listCost > 0) {
-            const ratio = data.allowance / data.listCost;
-            if (Math.abs(ratio - 1) > 0.01) {
-                goLine += ` (${ratio.toFixed(2)}× list price)`;
+            const value = data.allowance / data.listCost;
+            if (Math.abs(value - 1) > 0.01) {
+                ratio = value.toFixed(2);
             }
         }
-        lines.push(goLine);
+        lines.push(ratio
+            ? tr('tooltip_go_allowance_ratio', { cost: formatMoney(data.allowance), ratio })
+            : tr('tooltip_go_allowance', { cost: formatMoney(data.allowance) }));
     }
     if (data.cost !== null && data.billingSource !== 'go') {
-        lines.push(`Cost: ${formatMoney(data.cost)}`);
+        lines.push(tr('tooltip_cost', { cost: formatMoney(data.cost) }));
     }
     if (getSettings().showListPrice && data.listCost !== null
         && (data.cost === null || data.billingSource === 'go' || Math.abs(data.listCost - data.cost) > 1e-12)) {
-        lines.push(`List price / Console cost: ${formatMoney(data.listCost)}`);
+        lines.push(tr('tooltip_list', { cost: formatMoney(data.listCost) }));
     }
 
     return lines.join('\n');
@@ -430,21 +508,23 @@ function summarizeChat() {
 
 function formatSummary() {
     const summary = summarizeChat();
-    if (summary.generations === 0) return 'Chat total: no usage yet.';
+    if (summary.generations === 0) return tr('summary_no_usage');
 
     const parts = [];
-    if (summary.go > 0) parts.push(`Go ${formatMoney(summary.go)}`);
-    if (summary.cost > 0) parts.push(`cost ${formatMoney(summary.cost)}`);
+    if (summary.go > 0) parts.push(tr('summary_go', { cost: formatMoney(summary.go) }));
+    if (summary.cost > 0) parts.push(tr('summary_cost', { cost: formatMoney(summary.cost) }));
     if (summary.list > 0 && getSettings().showListPrice && (summary.go > 0 || summary.cost === 0)) {
-        parts.push(`list ${formatMoney(summary.list)}`);
+        parts.push(tr('summary_list', { cost: formatMoney(summary.list) }));
     }
-    if (summary.cacheRate !== null) parts.push(`cache ${Math.round(summary.cacheRate * 100)}%`);
-    parts.push(`${summary.generations} gen${summary.generations === 1 ? '' : 's'}`);
+    if (summary.cacheRate !== null) {
+        parts.push(tr('summary_cache', { percent: Math.round(summary.cacheRate * 100) }));
+    }
+    parts.push(tr('summary_gens', { count: summary.generations }));
     if (summary.lastData?.primary !== null && summary.lastData?.primary !== undefined) {
         const label = summary.lastData.primaryLabel === 'Go allowance' ? 'Go ' : '';
-        parts.push(`last ${label}${formatMoney(summary.lastData.primary)}`);
+        parts.push(tr('summary_last', { cost: `${label}${formatMoney(summary.lastData.primary)}` }));
     }
-    return `Chat total: ${parts.join(' · ')}`;
+    return tr('summary_total', { parts: parts.join(' · ') });
 }
 
 function formatSummaryCost(summary) {
@@ -487,9 +567,9 @@ function formatTopBarSummary() {
         parts.push(`⚡ ${Math.round(summary.cacheRate * 100)}%`);
     }
     const total = formatSummaryCost(summary);
-    if (total) parts.push(`total ${total}`);
+    if (total) parts.push(tr('topbar_total', { cost: total }));
     const last = summary.lastData ? formatBadgeCost(summary.lastData) : '';
-    if (last) parts.push(`last ${last}`);
+    if (last) parts.push(tr('topbar_last', { cost: last }));
     return parts.join(' · ');
 }
 
@@ -617,9 +697,12 @@ function onGenerationStopped() {
     setTimeout(() => renderBadge(lastIndex), 100);
 }
 
-function addSettingsUi() {
+function addSettingsUi(force = false) {
     const container = document.getElementById('extensions_settings');
-    if (!container || document.getElementById('opencode_usage_settings')) return;
+    const existing = document.getElementById('opencode_usage_settings');
+    if (existing && !force) return;
+    existing?.remove();
+    if (!container) return;
 
     const wrapper = document.createElement('div');
     wrapper.id = 'opencode_usage_settings';
@@ -627,42 +710,42 @@ function addSettingsUi() {
     wrapper.innerHTML = `
         <div class="inline-drawer">
             <div class="inline-drawer-toggle inline-drawer-header">
-                <b>OpenCode Usage Badge</b>
+                <b>${tr('settings_title')}</b>
                 <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div>
             </div>
             <div class="inline-drawer-content">
                 <label class="checkbox_label">
                     <input type="checkbox" id="opencode_usage_enabled">
-                    <span>Show cache rate and cost on messages</span>
+                    <span>${tr('settings_enabled')}</span>
                 </label>
                 <div class="opencode-usage-setting-row">
-                    <span>Badge cost</span>
+                    <span>${tr('settings_badge_cost')}</span>
                     <select id="opencode_usage_cost_display" class="text_pole">
-                        <option value="auto">Auto (Go allowance / actual cost)</option>
-                        <option value="go">Go allowance</option>
-                        <option value="list">List price (Console)</option>
-                        <option value="both">Both</option>
+                        <option value="auto">${tr('settings_auto')}</option>
+                        <option value="go">${tr('settings_go')}</option>
+                        <option value="list">${tr('settings_list')}</option>
+                        <option value="both">${tr('settings_both')}</option>
                     </select>
                 </div>
                 <div class="opencode-usage-setting-row">
-                    <span>Summary placement</span>
+                    <span>${tr('settings_placement')}</span>
                     <select id="opencode_usage_placement" class="text_pole">
-                        <option value="top-left">Above chat, left</option>
-                        <option value="top-right">Above chat, right</option>
-                        <option value="top-center">Above chat, center</option>
-                        <option value="off">Off</option>
+                        <option value="top-left">${tr('settings_top_left')}</option>
+                        <option value="top-right">${tr('settings_top_right')}</option>
+                        <option value="top-center">${tr('settings_top_center')}</option>
+                        <option value="off">${tr('settings_off')}</option>
                     </select>
                 </div>
                 <label class="checkbox_label">
                     <input type="checkbox" id="opencode_usage_show_summary">
-                    <span>Show chat summary</span>
+                    <span>${tr('settings_show_summary')}</span>
                 </label>
                 <label class="checkbox_label">
                     <input type="checkbox" id="opencode_usage_list_price">
-                    <span>Show list price in tooltip</span>
+                    <span>${tr('settings_show_list')}</span>
                 </label>
-                <div id="opencode_usage_summary" class="opencode-usage-summary">Chat total: no usage yet.</div>
-                <small>Data comes from the usage object in the chat completion response.</small>
+                <div id="opencode_usage_summary" class="opencode-usage-summary">${tr('summary_no_usage')}</div>
+                <small>${tr('settings_hint')}</small>
             </div>
         </div>`;
     container.appendChild(wrapper);
@@ -719,7 +802,7 @@ function registerEvents() {
     eventSource.on(eventTypes.MORE_MESSAGES_LOADED, onMoreMessagesLoaded);
     eventSource.on(eventTypes.GENERATION_STOPPED, onGenerationStopped);
     eventSource.on(eventTypes.APP_READY, () => {
-        addSettingsUi();
+        addSettingsUi(true);
         scheduleRenderAll(500);
     });
 
@@ -742,10 +825,11 @@ function registerEvents() {
     }, true);
 }
 
-(function init() {
+(async function init() {
+    await loadLocale();
     getSettings();
     installFetchHook();
-    addSettingsUi();
+    addSettingsUi(true);
     registerEvents();
-    scheduleRenderAll(1000);
+    scheduleRenderAll(500);
 })();

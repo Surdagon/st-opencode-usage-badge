@@ -4,6 +4,8 @@ A practical guide to connecting **OpenCode Go** to **SillyTavern**, including th
 required `x-opencode-session` header, a small local proxy for a stable setup, and
 a comparison with **OpenRouter**.
 
+**Guide languages:** [English](OPENCODE-GO.md) · [Русский](OPENCODE-GO.ru.md) · [Español](OPENCODE-GO.es.md) · [Français](OPENCODE-GO.fr.md) · [Deutsch](OPENCODE-GO.de.md) · [Português (BR)](OPENCODE-GO.pt-br.md) · [Italiano](OPENCODE-GO.it.md) · [Polski](OPENCODE-GO.pl.md) · [Türkçe](OPENCODE-GO.tr.md) · [中文](OPENCODE-GO.zh-cn.md) · [日本語](OPENCODE-GO.ja.md)
+
 > **Коротко по-русски:** Go-эндпоинт — `https://opencode.ai/inference/go/openai/v1`.
 > Нужен ключ `oc_sk_...` из Console и заголовок `x-opencode-session`, иначе будет
 > `400 MissingSessionID`. Проще всего поставить локальный прокси из `proxy/` и
