@@ -1,0 +1,91 @@
+.opencode-usage-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    width: fit-content;
+    margin: 4px 0 2px;
+    padding: 1px 6px;
+    border: 1px solid var(--SmartThemeBorderColor, rgba(127, 127, 127, 0.25));
+    border-radius: 999px;
+    background: var(--SmartThemeBlurTintColor, rgba(127, 127, 127, 0.12));
+    color: var(--SmartThemeEmColor, #9aa0a6);
+    font-size: 11px;
+    line-height: 1.5;
+    white-space: nowrap;
+    cursor: help;
+    user-select: none;
+    opacity: 0.9;
+}
+
+.opencode-usage-badge .oc-cache {
+    color: var(--SmartThemeQuoteColor, #8ab4f8);
+}
+
+.opencode-usage-badge .oc-cost {
+    color: var(--SmartThemeEmColor, #9aa0a6);
+}
+
+.opencode-usage-settings small {
+    display: block;
+    margin-top: 4px;
+    opacity: 0.7;
+}
+
+.opencode-usage-setting-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 6px 0;
+}
+
+.opencode-usage-setting-row > span {
+    flex: 0 0 auto;
+}
+
+.opencode-usage-setting-row > select {
+    flex: 1 1 auto;
+}
+
+.opencode-usage-summary {
+    margin: 6px 0;
+    padding: 4px 6px;
+    border-radius: 4px;
+    background: var(--SmartThemeBlurTintColor, rgba(127, 127, 127, 0.12));
+    color: var(--SmartThemeEmColor, #9aa0a6);
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+.opencode-usage-topbar {
+    display: block;
+    align-self: flex-start;
+    width: fit-content;
+    max-width: calc(100% - 16px);
+    margin: 4px 8px 2px;
+    padding: 2px 8px;
+    border: 1px solid var(--SmartThemeBorderColor, rgba(127, 127, 127, 0.25));
+    border-radius: 999px;
+    background: var(--SmartThemeBlurTintColor, rgba(127, 127, 127, 0.12));
+    color: var(--SmartThemeEmColor, #9aa0a6);
+    font-size: 11px;
+    line-height: 1.5;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    cursor: help;
+    user-select: none;
+    opacity: 0.9;
+    flex: 0 0 auto;
+    z-index: 1;
+}
+
+.opencode-usage-topbar.align-right {
+    align-self: flex-end;
+    margin-left: auto;
+}
+
+.opencode-usage-topbar.align-center {
+    align-self: center;
+    margin-left: auto;
+    margin-right: auto;
+}
