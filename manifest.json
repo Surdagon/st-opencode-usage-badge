@@ -8,5 +8,6 @@
     "author": "OpenCode Usage Badge contributors",
     "version": "1.0.0",
     "minimum_client_version": "1.12.0",
+    "homePage": "https://github.com/Surdagon/st-opencode-usage-badge",
     "auto_update": false
 }

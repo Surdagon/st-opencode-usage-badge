@@ -45,11 +45,11 @@ Chat summary above the chat:
 
    ```bash
    cd SillyTavern/public/scripts/extensions/third-party
-   git clone https://github.com/<your-username>/SillyTavern-OpenCode-Usage-Badge.git
+   git clone https://github.com/Surdagon/st-opencode-usage-badge.git
    ```
 
    Or download the ZIP and extract it into
-   `public/scripts/extensions/third-party/SillyTavern-OpenCode-Usage-Badge`.
+   `public/scripts/extensions/third-party/st-opencode-usage-badge`.
 
 2. Reload SillyTavern (`Ctrl+F5`).
 3. The extension is enabled by default. If needed, enable it under
